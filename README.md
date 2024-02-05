@@ -1,4 +1,13 @@
-# beth-stack
+# A simple TODO app
+
+## Intro
+
+This repo is a simple CRUD todo web app for the purposes of learning and
+experimenting with new technology.
+
+## Tech
+
+## Instructions
 
 To install dependencies:
 
@@ -12,4 +21,5 @@ To run:
 bun run index.ts
 ```
 
-This project was created using `bun init` in bun v1.0.15. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+This project was created using `bun init` in bun v1.0.15. [Bun](https://bun.sh)
+is a fast all-in-one JavaScript runtime.
