@@ -1,6 +1,9 @@
 import { Elysia, t } from 'elysia';
 import { html } from '@elysiajs/html';
 import * as elements from 'typed-html';
+import { db } from './db';
+import { Todo, todos } from './db/schema';
+import { eq } from 'drizzle-orm';
 
 const app = new Elysia()
   .use(html())
@@ -16,47 +19,29 @@ const app = new Elysia()
       </BaseHtml>
     )
   )
-  .post('clicked', () => (
-    <div class='text-blue-600'>Coming from the server</div>
-  ))
-  .get('/todos', () => <TodoList todos={db} />)
-  // add todo
-  .post(
-    '/todos',
-    ({ body }) => {
-      // input -> is an empty string
-      if (body.content.length === 0) {
-        throw new Error('Content is required');
-      }
-      // fetch the last id in db
-      let lastId = db.length > 0 ? db[db.length - 1].id : 0;
-      // create a new todo
-      const newTodo = {
-        id: lastId++,
-        content: body.content,
-        completed: false,
-      };
-      db.push(newTodo);
-      return <TodoItem {...newTodo} />;
-    },
-    {
-      body: t.Object({
-        content: t.String(),
-      }),
-    }
-  )
-  // toggle todo completion
+  .get('/todos', async () => {
+    const data = await db.select().from(todos).all();
+    return <TodoList todos={data} />;
+  })
   .post(
     '/todos/toggle/:id',
     // on request
-    ({ params }) => {
-      // find the todo based on ID
-      const todo = db.find((todo) => todo.id === params.id);
-      // toggle the completed property
-      if (todo) {
-        todo.completed = !todo.completed;
-        return <TodoItem {...todo} />;
+    async ({ params }) => {
+      const oldTodo = await db
+        .select()
+        .from(todos)
+        .where(eq(todos.id, params.id))
+        .get();
+      if (!oldTodo) {
+        throw new Error('Todo not found');
       }
+      const newTodo = await db
+        .update(todos)
+        .set({ completed: !oldTodo.completed })
+        .where(eq(todos.id, params.id))
+        .returning()
+        .get();
+      return <TodoItem {...newTodo} />;
     },
     // input validation from the route params using t Object from ElysiaJS. "t" will automatically coerce any string to a number.
     {
@@ -67,17 +52,28 @@ const app = new Elysia()
   )
   .delete(
     '/todos/:id',
-    ({ params }) => {
-      // find the todo based on ID
-      const todo = db.find((todo) => todo.id === params.id);
-      // remove the todo from the database
-      if (todo) {
-        db.splice(db.indexOf(todo), 1);
-      }
+    async ({ params }) => {
+      await db.delete(todos).where(eq(todos.id, params.id)).run();
+      return '';
     },
     {
       params: t.Object({
         id: t.Numeric(),
+      }),
+    }
+  )
+  .post(
+    '/todos',
+    async ({ body }) => {
+      if (body.content.length === 0) {
+        throw new Error('content cannot be empty');
+      }
+      const newTodo = await db.insert(todos).values(body).returning().get();
+      return <TodoItem {...newTodo} />;
+    },
+    {
+      body: t.Object({
+        content: t.String(),
       }),
     }
   )
@@ -99,17 +95,6 @@ const BaseHtml = ({ children }: any) => `
 </head>
 ${children}
 `;
-
-type Todo = {
-  id: number;
-  content: string;
-  completed: boolean;
-};
-
-const db: Todo[] = [
-  { id: 1, content: 'Buy groceries', completed: false },
-  { id: 2, content: 'Learn Typescript', completed: false },
-];
 
 function TodoItem({ content, completed, id }: Todo) {
   return (
