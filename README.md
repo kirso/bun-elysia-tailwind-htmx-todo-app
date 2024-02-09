@@ -31,7 +31,7 @@ Based on the [BETH stack](https://github.com/ethanniser/the-beth-stack) by
 
 ## TODO
 
-- To add authentication with ![Lucia](https://lucia-auth.com/)
+- To add authentication with [Lucia](https://lucia-auth.com/)
 
 ## Instructions
 
