@@ -23,7 +23,7 @@ Based on the [BETH stack](https://github.com/ethanniser/the-beth-stack) by
 - [Typed HTML](https://github.com/nicojs/typed-html) - typesafe HTML templates
 - [Tailwind](https://tailwindcss.com/) - utility first CSS
 - [Turso](https://www.turso.tech) - SQLite on the edge
-- [Drizzle ORM](https://orm.drizzle.team/)) - typesafe ORM
+- [Drizzle ORM](https://orm.drizzle.team/) - typesafe ORM
 - [HTMX](https://www.htmx.org) - simple interactivity via hypermedia systems
 - [Hyperscript](https://www.hyperscript.org/) - scripting for simple DOM
   manipulation
