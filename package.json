@@ -15,7 +15,7 @@
     "@elysiajs/html": "^0.8.0",
     "@libsql/client": "^0.4.3",
     "drizzle-orm": "^0.29.3",
-    "elysia": "next"
+    "elysia": "1.4.13"
   },
   "scripts": {
     "db:push": "bunx drizzle-kit push:sqlite",
